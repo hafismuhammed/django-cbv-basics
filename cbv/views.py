@@ -1,11 +1,12 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.generic.base import TemplateView
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView, ListView, FormView
 from django.db.models import F
 from django.utils import timezone
 
 from .models import Post, Books
+from .forms import AddForm
 
 
 def index(request):
@@ -32,7 +33,7 @@ class IndexView(TemplateView):
         context['books'] = Books.objects.all()
         return context
 
-# similar to  TemplateView
+# similar to  TemplateView listing datas
 # in Listview pagination allowed
 class BookListView(ListView):
 
@@ -77,5 +78,26 @@ class BookDetailView(DetailView):
         return context
 
 
+''' The FormView applications
+displaying a form
+    *On error -> redisplays form with validation errors;
+    *On success -> redirects to a new Url
 
+    eg: contact form, send mail
+
+Not typically used for:
+    *Not displaying a form page
+    *Saving data to a database 
+    we can use this data save but not proper way '''
+
+
+class AddBookView(FormView):
+
+    template_name = 'add.html'
+    form_class = AddForm
+    success_url = '/books/'
+
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
 
